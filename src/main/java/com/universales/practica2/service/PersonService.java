@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.universales.practica2.dto.RequestPersonDto;
+import com.universales.practica2.dto.ResponseTokenDto;
 import com.universales.practica2.repository.PersonRepository;
 import com.universales.practica2.entity.Person;
 
@@ -19,11 +20,13 @@ import com.universales.practica2.entity.Person;
 public class PersonService {
 	
 	PersonRepository pRepository;
+	JwtService jwtService;
 	
 	ModelMapper modelMapper = new ModelMapper();
 	
-	public PersonService(PersonRepository pRepository) {
+	public PersonService(PersonRepository pRepository, JwtService jwtService) {
 		this.pRepository = pRepository;
+		this.jwtService = jwtService;
 	}
 	
 	@PostMapping("/noauth/login")
@@ -49,7 +52,23 @@ public class PersonService {
 				
 				if(person.getPassword().equals(personDto.getPassword())) {
 					
-					return ResponseEntity.ok("Login Exitoso");
+					String token = jwtService.generarToken(person.getUsername());
+					
+					if(token != null) {
+						
+						ResponseTokenDto responseTokenDto = new ResponseTokenDto();
+						
+						responseTokenDto.setToken(token);
+						
+						return ResponseEntity.ok(responseTokenDto);
+						
+					}else {
+						
+						return ResponseEntity
+								.status(HttpStatus.INTERNAL_SERVER_ERROR)
+								.body("Error al crear token");
+						
+					}
 					
 				}
 				

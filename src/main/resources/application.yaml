@@ -15,3 +15,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.OracleDialect
+
+jwt:
+  secret: esta-es-mi-clave-super-secreta-29402-que-nadie-descubrira
+  expiration-ms: 60000
