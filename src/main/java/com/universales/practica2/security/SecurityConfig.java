@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -22,6 +24,13 @@ public class SecurityConfig {
 					.requestMatchers("/api/noauth/**").permitAll()
 					.anyRequest().authenticated()
 					
+			)
+			.exceptionHandling(ex -> ex
+				.authenticationEntryPoint((request, response, authException) -> {
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					response.setContentType("text/plain;charset=UTF-8");
+					response.getWriter().write("Acceso no otorgado. Necesita Autenticación");
+				})
 			);
 		
 		return http.build();
